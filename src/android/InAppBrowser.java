@@ -169,8 +169,33 @@ public class InAppBrowser extends CordovaPlugin {
                 t = SELF;
             }
             final String target = t;
-            final HashMap<String, String> features = parseFeature(args.optString(2));
-            final HashMap<String, String> headers = parseHeaders(args.optString(3));
+
+            final HashMap<String, String> features = new HashMap<String, String>();
+            final HashMap<String, String> headers = new HashMap<String, String>();
+
+            String optString = args.optString(2);
+            
+            if (optString.equals(NULL)) {
+                return null;
+            } else {
+                StringTokenizer featuresTokenizer = new StringTokenizer(optString, ",");
+                StringTokenizer option;
+                while(featuresTokenizer.hasMoreElements()) {
+                    option = new StringTokenizer(featuresTokenizer.nextToken(), "=");
+                    if (option.hasMoreElements()) {
+                        String key = option.nextToken();
+                        String value = option.nextToken();
+                        if (!customizableOptions.contains(key)) {
+                            value = value.equals("yes") || value.equals("no") ? value : "yes";
+                        }
+                        if (key.equals("authorization")) {
+                            headers.put(key, value); 
+                        } else {
+                            features.put(key, value);
+                        }
+                    }
+                }
+            }
 
             LOG.d(LOG_TAG, "target = " + target);
 
@@ -419,59 +444,6 @@ public class InAppBrowser extends CordovaPlugin {
             });
         } else {
             LOG.d(LOG_TAG, "Can't inject code into the system browser");
-        }
-    }
-
-    /**
-     * Put the list of features into a hash map
-     *
-     * @param optString
-     * @return
-     */
-    private HashMap<String, String> parseFeature(String optString) {
-        if (optString.equals(NULL)) {
-            return null;
-        } else {
-            HashMap<String, String> map = new HashMap<String, String>();
-            StringTokenizer features = new StringTokenizer(optString, ",");
-            StringTokenizer option;
-            while(features.hasMoreElements()) {
-                option = new StringTokenizer(features.nextToken(), "=");
-                if (option.hasMoreElements()) {
-                    String key = option.nextToken();
-                    String value = option.nextToken();
-                    if (!customizableOptions.contains(key)) {
-                        value = value.equals("yes") || value.equals("no") ? value : "yes";
-                    }
-                    map.put(key, value);
-                }
-            }
-            return map;
-        }
-    }
-
-    /**
-     * Put the headers string into a hash map
-     *
-     * @param headersString string of headers comma separated (key=value)
-     * @return map of headers
-     */
-    private HashMap<String, String> parseHeaders(String headersString) {
-        if (headersString.equals(NULL)) {
-            return null;
-        } else {
-            HashMap<String, String> map = new HashMap<String, String>();
-            StringTokenizer headers = new StringTokenizer(headersString, ",");
-            StringTokenizer header;
-            while(headers.hasMoreElements()) {
-                header = new StringTokenizer(headers.nextToken(), "=");
-                if (header.hasMoreElements()) {
-                    String key = header.nextToken().replace("@e","=").replace("@c", ",").replace("@a","@");
-                    String value = header.nextToken().replace("@e","=").replace("@c", ",").replace("@a","@");
-                    map.put(key, value);
-                }
-            }
-            return map;
         }
     }
 
