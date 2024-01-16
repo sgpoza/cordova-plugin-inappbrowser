@@ -188,7 +188,7 @@ public class InAppBrowser extends CordovaPlugin {
                         if (!customizableOptions.contains(key)) {
                             value = value.equals("yes") || value.equals("no") ? value : "yes";
                         }
-                        if (key.equals("authorization")) {
+                        if (key.equals("Authorization")) {
                             headers.put(key, value); 
                         } else {
                             features.put(key, value);
