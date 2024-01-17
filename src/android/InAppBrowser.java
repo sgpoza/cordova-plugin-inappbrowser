@@ -175,9 +175,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             String optString = args.optString(2);
             
-            if (optString.equals(NULL)) {
-                return null;
-            } else {
+            if (!optString.equals(NULL)) {
                 StringTokenizer featuresTokenizer = new StringTokenizer(optString, ",");
                 StringTokenizer option;
                 while(featuresTokenizer.hasMoreElements()) {
@@ -185,12 +183,12 @@ public class InAppBrowser extends CordovaPlugin {
                     if (option.hasMoreElements()) {
                         String key = option.nextToken();
                         String value = option.nextToken();
-                        if (!customizableOptions.contains(key)) {
-                            value = value.equals("yes") || value.equals("no") ? value : "yes";
-                        }
                         if (key.equals("Authorization")) {
                             headers.put(key, value); 
                         } else {
+                            if (!customizableOptions.contains(key)) {
+                                value = value.equals("yes") || value.equals("no") ? value : "yes";
+                            }
                             features.put(key, value);
                         }
                     }
@@ -267,7 +265,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // SYSTEM
                     else if (SYSTEM.equals(target)) {
                         LOG.d(LOG_TAG, "in system");
-                        result = openExternal(url);
+                        result = openExternal(url, headers);
                     }
                     // BLANK - or anything else
                     else {
@@ -451,9 +449,10 @@ public class InAppBrowser extends CordovaPlugin {
      * Display a new browser with the specified URL.
      *
      * @param url the url to load.
+     * @param headers the additional headers
      * @return "" if ok, or error message.
      */
-    public String openExternal(String url) {
+    public String openExternal(String url, HashMap<String, String> headers) {
         try {
             Intent intent = null;
             intent = new Intent(Intent.ACTION_VIEW);
@@ -466,6 +465,14 @@ public class InAppBrowser extends CordovaPlugin {
                 intent.setData(uri);
             }
             intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
+
+            // Addimg headers
+            Bundle bundle = new Bundle();
+            for (HashMap.Entry<String, String> header : headers.entrySet()) {
+                bundle.putString(header.getKey(), header.getValue());
+            }
+            intent.putExtra(Browser.EXTRA_HEADERS, bundle);
+
             // CB-10795: Avoid circular loops by preventing it from opening in the current app
             this.openExternalExcludeCurrentApp(intent);
             return "";
@@ -625,6 +632,7 @@ public class InAppBrowser extends CordovaPlugin {
      *
      * @param url the url to load.
      * @param features jsonObject
+     * @param headers the additional headers
      */
     public String showWebPage(final String url, HashMap<String, String> features, final HashMap<String, String> headers) {
         // Determine if we should hide the location bar.
