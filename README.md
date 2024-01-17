@@ -149,7 +149,7 @@ instance, or the system browser.
     - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
     - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
 
-    This version of the plugin also supports the authorization header:
+    In Android, this version of the plugin also supports the authorization header:
     - __Authorization__: Set to `Bearer <token>`, where `<token>` is the access token of the current user session.
 
 ### Supported Platforms
