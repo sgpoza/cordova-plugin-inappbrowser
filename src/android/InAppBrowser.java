@@ -182,8 +182,8 @@ public class InAppBrowser extends CordovaPlugin {
                     option = new StringTokenizer(featuresTokenizer.nextToken(), "=");
                     if (option.hasMoreElements()) {
                         String key = option.nextToken();
-                        String value = option.nextToken();
-                        if (key.equals("Authorization")) {
+                        String value = option.nextToken().replace('&', '=');
+                        if (key.equals("Authorization") || key.equals("Cookie")) {
                             headers.put(key, value); 
                         } else {
                             if (!customizableOptions.contains(key)) {
